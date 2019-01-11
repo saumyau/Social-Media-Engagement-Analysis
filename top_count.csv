@@ -1,0 +1,11 @@
+Single,Bigrams,Trigrams
+portman,"['natalie', 'portman']","['tale', 'love', 'darkness']"
+photos,"['knight', 'cups']","['la', 'dance', 'project']"
+film,"['film', 'festival']","['death', 'life', 'john']"
+natalie,"['song', 'song']","['life', 'john', 'donovan']"
+jackie,"['video', 'interview']","['rouge', 'dior', 'campaign']"
+rt,"['portman', 'calendar']","['portman', 'stew', 'munchies']"
+natalieportman,"['vox', 'lux']","['patreon', 'reward', 'way']"
+video,"['press', 'conference']","['wallpaper', 'calendar', 'march']"
+photo,"['portman', 'portman']","['cups', 'press', 'conference']"
+annihilation,"['star', 'wars']","['dance', 'project', 'benefit']"
