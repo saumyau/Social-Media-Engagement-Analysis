@@ -61,8 +61,8 @@ class StdOutListener(StreamListener):
 
 # function to authenticate the credentials to connect to twitter using Tweepy API
 def authentication():
-    auth = tweepy.OAuthHandler('2E7ZXMmYNVZg72y9ezHxB9vSd','gQp7w2ASkNalLOzr3wFRhnp6vxLeZFjBIhOlnvrlUJVL5R6vlh')
-    auth.set_access_token('156562404-F5UtJpdluBBhlUpt4MX24ne9ZEq0leKCvMXTeXCK','0xJEifiJufhIfDGoPnkJWO1JYtVV8dBvkuZ6Lx0e6xx51')
+    auth = tweepy.OAuthHandler('XX','XX')
+    auth.set_access_token('XX','XX')
     api=tweepy.API(auth,wait_on_rate_limit=True)
     return api
 
