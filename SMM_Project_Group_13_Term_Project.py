@@ -16,11 +16,9 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import PorterStemmer
 from collections import Counter
-from nltk import pos_tag
-from nltk import ngrams
+from nltk import pos_tag, ngrams
 from tkinter import *
-from tkinter import messagebox  
-from tkinter import filedialog
+from tkinter import messagebox, filedialog
 from ttkthemes import themed_tk as tk
 import tkinter.font as font
 import seaborn as sns
@@ -56,9 +54,6 @@ class StdOutListener(StreamListener):
     def on_error(self, status):
         print(status)
 
-
-
-
 # function to authenticate the credentials to connect to twitter using Tweepy API
 def authentication():
     auth = tweepy.OAuthHandler('XX','XX')
@@ -67,17 +62,12 @@ def authentication():
     return api
 
 
-# In[ ]:
-
-
 api = authentication()
-
-
-# In[ ]:
-
 
 # 1. Imports data from the 'Categories_List.csv' contains the categorical data into a dataframe
 # 2. Imports data from the 'Users_Set_1.csv' contains the list of user names into a dataframe
+
+
 def load_files():
     try:
         global category_df
@@ -88,33 +78,25 @@ def load_files():
             col_count = 0
             column_data = cat_df[column].str.lower()
             category_df.insert(loc=col_count,column=column,value=pd.Series(column_data))
-            col_count+=1
-        #initalise user data set frame
+            col_count += 1
     except:
         print("Please load the categories and user data set...")
-    
-
-
-# In[ ]:
-
 
 # function to write data into a CSV file
+
+
 def writeToCsv(name,df):
     df.to_csv(''+name+'.csv',encoding='utf-8',index=False)
-
-
 # In[ ]:
-
-
 # function to remove non-ASCII characters from a text
+
+
 def removeNonAscii(text):
     return "".join(char for char in text if ord(char) < 128)
 
-
-# In[ ]:
-
-
 # function to fetch tweet results using cursors
+
+
 def limit_handled(cursor):
     while True:
         try:
@@ -124,14 +106,12 @@ def limit_handled(cursor):
             time.sleep(15 * 60)
             print("Trying again")
 
-
-# In[ ]:
-
-
 # 1. function to extract tweets,retweets & favorites of a given user
 # 2. Data cleansing like - removing unneccessary words from the tweets are performed
 # 3. Results are stored in the dataframe.
 # 4. A CSV file of the fotmat - 'ScreeName.csv' will be exported containing a list of tweets, retweets and favorites.
+
+
 def extractTweets(screen_name):
     #create empty data frame
     dataFrame = pd.DataFrame()
@@ -169,7 +149,7 @@ def extractTweets(screen_name):
             break
     #print(tweet_count)
     # insert tweets in the dataframe
-    dataFrame.insert(loc=0,column='Tweets',value=pd.Series(tweet_text)) 
+    dataFrame.insert(loc=0,column='Tweets',value=pd.Series(tweet_text))
     # insert retweets in the dataframe
     dataFrame.insert(loc=1,column='Retweets',value=pd.Series(retweet_text))
     #insert favorite tweets in the dataframe
@@ -179,17 +159,15 @@ def extractTweets(screen_name):
     writeToCsv(screen_name,dataFrame)
     performSentimentAnalysis(screen_name,dataFrame)
 
-
-# In[ ]:
-
-
 # 1.function to perform sentioment analysis of all the tweets
+
+
 def performSentimentAnalysis(screen_name,dataFrame):
     df = copy.deepcopy(dataFrame)
     senti_df = df['Tweets'].append([df['Retweets'],df['Favorite Tweets']]).reset_index(drop=True)
     senti_df = pd.DataFrame(senti_df,columns=['twitter_text']).dropna()
     senti_df['category'] = np.nan
-    senti_df = senti_df.reset_index(drop=True) 
+    senti_df = senti_df.reset_index(drop=True)
     analyseSentiment = SentimentIntensityAnalyzer()
     for itr in range(0,len(senti_df)):
         index = list(np.where(senti_df['twitter_text'] == senti_df.iloc[itr]['twitter_text'] )[0])
@@ -198,16 +176,14 @@ def performSentimentAnalysis(screen_name,dataFrame):
         if (senti_score['compound'] > 0.0):
             senti_df.loc[index,'category'] = 'positive'
         else:
-            senti_df.loc[index,'category'] = 'negative'        
+            senti_df.loc[index,'category'] = 'negative'
     writeToCsv(screen_name + '_Sentiment',senti_df)
     #print(senti_df)
-    analyseText(senti_df,screen_name)   
-
-
-# In[ ]:
-
+    analyseText(senti_df,screen_name)
 
 # 1.function that takes the positive tweets, performs data cleansing and noun related words are extracted.
+
+
 def analyseText(senti_df,screen_name):
     dataFrame = copy.deepcopy(senti_df)
     index = list(np.where(dataFrame['category'] == 'positive')[0])
@@ -240,11 +216,9 @@ def analyseText(senti_df,screen_name):
     #print(all_nouns_text)
     getTopWords(all_nouns_text,screen_name)
 
-
-# In[ ]:
-
-
 # 1. function that gets the highest frequency words from the unigram, bigrams and trigrams list.
+
+
 def getTopWords(all_nouns_text,screen_name):
     nouns_text = copy.deepcopy(all_nouns_text)
     topCount_df=pd.DataFrame()
@@ -273,13 +247,11 @@ def getTopWords(all_nouns_text,screen_name):
     topCount_df.insert(loc=2,column='Trigrams',value=pd.Series(all_trigrams))
     #print(topCount_df)
     writeToCsv('top_count',topCount_df)
-    findCategories(topCount_df,screen_name)   
-
-
-# In[ ]:
-
+    findCategories(topCount_df,screen_name)
 
 # 1. function that keeps track of the number of words belongs to what categories.
+
+
 def findCategories(topCount_df,screen_name):
     count_df = copy.deepcopy(topCount_df)
     # create dictionaries for tracking word cout & categories
@@ -296,15 +268,15 @@ def findCategories(topCount_df,screen_name):
             elif isinstance(key,list):
                 for key_list in key:
                     if key_list not in word_count_dict.keys():
-                        word_count_dict[key_list] = 0  
-                        word_category_dict[key_list] = [] 
+                        word_count_dict[key_list] = 0
+                        word_category_dict[key_list] = []
     #print(word_count_dict)
     # update count values in word_count_dict & categories in word_category_dict
     column_labels = list(category_df.columns)
     for key in word_count_dict.keys():
-        for column in column_labels: 
+        for column in column_labels:
             if any(category_df[column] == key):
-                word_count_dict[key] +=1 
+                word_count_dict[key] +=1
                 word_category_dict[key].append(column)
     #print(word_count_dict)
     #print(word_category_dict)
@@ -312,13 +284,10 @@ def findCategories(topCount_df,screen_name):
     #print(sorted_word_count_dict)
     #categoryWisePercent(sorted_word_count_dict,word_category_dict)
     categoryWisePercent(word_count_dict,word_category_dict,screen_name)
-    
-
-
-# In[ ]:
-
 
 # 1. function that classifies words belonging to each categories and caluclates the categorywise percentage
+
+
 def categoryWisePercent(word_count_dict,word_category_dict,screen_name):
     sorted_word_dict = copy.deepcopy(word_count_dict)
     category_dict = copy.deepcopy(word_category_dict)
@@ -333,7 +302,7 @@ def categoryWisePercent(word_count_dict,word_category_dict,screen_name):
                 category_list.append(cat_list[itr])
     percent_df['Category'] = category_list
     percent_df['Words'] = 0
-    percent_df['Percentage'] = 0 
+    percent_df['Percentage'] = 0
     #fill words column
     for key in sorted_word_dict:
         cat_list = list(category_dict[key])
@@ -412,16 +381,12 @@ def get_hashtags(screen_name):
     #canvas.mpl_connect('key_press_event', on_key_event)
 
 
-
-
 def _quit():
     root.quit()     # stops mainloop
     root.destroy()  # this is necessary on Windows to prevent
                     # Fatal Python Error: PyEval_RestoreThread: NULL tstate
-    
 
 
-# In[ ]:
 def plot_piechart(percent_df,screen_name):
     fig, ax = plt.subplots(figsize=(10, 10), subplot_kw=dict(aspect="equal"))
     per_df = copy.deepcopy(percent_df)
@@ -432,9 +397,9 @@ def plot_piechart(percent_df,screen_name):
         if itr in index:
             explode_list.append(0.1)
         else:
-            explode_list.append(0.0)        
+            explode_list.append(0.0)
     #print(explode_list)
-    explode_tuple = tuple(explode_list) 
+    explode_tuple = tuple(explode_list)
     labels = list(per_df['Category'])
     values = list(per_df['Words'])
     wedges, texts, autotexts = ax.pie(values, autopct=lambda pct: func(pct, values),textprops=dict(color="w"))
@@ -454,18 +419,16 @@ def plot_piechart(percent_df,screen_name):
 # 1. function that classifies users belonging to each category.
 # 2. 'User_Categorized_List.csv' contains the list of users against different categories.
 
-
-# In[ ]:
-
-
 # 1 . function to browse for the user dataset file.
+
+
 def browseFile():
     global filename
     if textbox.compare("end-1c","!=","1.0"):
         textbox.delete(1.0,END)
     if lb.index('end') != 0:
-        lb.delete(0,END)        
-    filename = filedialog.askopenfilename(initialdir="/",title="Select File",filetypes = 
+        lb.delete(0,END)
+    filename = filedialog.askopenfilename(initialdir="/",title="Select File",filetypes =
                                          (("CSV Files","*.csv"),("All Files","*.*"))
                                          )
     textbox.insert(END,filename)
@@ -477,7 +440,8 @@ def browseFile():
     for i in item_list:
         lb.insert(END, i)
     lb.place(x=150,y=200,width=300)
-    lb.bind("<<ListboxSelect>>", onSelect)    
+    lb.bind("<<ListboxSelect>>", onSelect)
+
 
 def onSelect(val):
     sender = val.widget
@@ -489,7 +453,7 @@ def onSelect(val):
     load_files(filename)
     #main()
     extractTweets(value)
-         
+
 
 def retrieve_input():
     inputValue = textBox.get("1.0","end-1c")
@@ -502,13 +466,11 @@ def retrieve_input():
         #main()
         extractTweets(inputValue)
         lb1.insert(3,"Execution Completed")
-        msg = messagebox.showinfo('Success','Results Generated Successfully. ')  
+        msg = messagebox.showinfo('Success','Results Generated Successfully. ')
     else:
         msg = messagebox.showinfo('Error','Please browse and select the user dataset file')
 
 
-    
-# In[ ]:
 def show_pie():
     im = PIL.Image.open("pie.png")
     photo = PIL.ImageTk.PhotoImage(im)
@@ -516,6 +478,7 @@ def show_pie():
     label = Tk.Label(root, image=photo)
     label.image = photo  # keep a reference!
     label.place(x=500,y=0)
+
 
 def show_bubble():
     novi = Toplevel()
@@ -534,6 +497,7 @@ def show_bubble():
     #toolbar.update()
     #canvas._tkcanvas.pack(side=Tk.TOP, fill=Tk.NONE, expand=1)
     #canvas.mpl_connect('key_press_event', on_key_event)
+
 
 def show_data():
     with open("Categories_List.csv", newline = "") as file:
@@ -555,7 +519,7 @@ root = Tk.Tk()
 #root= tk.ThemedTk()
 #root.get_themes()
 root.geometry("{0}x{1}+0+0".format(root.winfo_screenwidth(), root.winfo_screenheight()))
-root.focus_set() 
+root.focus_set()
 root.bind("<Escape>", lambda e: e.widget.quit())
 root.configure(background='#a52a2a')
 #root.style = ttk.Style()
